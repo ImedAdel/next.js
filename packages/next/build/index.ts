@@ -49,19 +49,19 @@ import { BuildManifest } from '../next-server/server/get-page-files'
 import '../next-server/server/node-polyfill-fetch'
 import { normalizePagePath } from '../next-server/server/normalize-page-path'
 import { getPagePath } from '../next-server/server/require'
-import * as ciEnvironment from '../telemetry/ci-info'
-import {
-  eventBuildCompleted,
-  eventBuildOptimize,
-  eventCliSession,
-  eventNextPlugins,
-} from '../telemetry/events'
-import { Telemetry } from '../telemetry/storage'
+// import * as ciEnvironment from '../telemetry/ci-info'
+// import {
+//   eventBuildCompleted,
+//   eventBuildOptimize,
+//   eventCliSession,
+//   eventNextPlugins,
+// } from '../telemetry/events'
+// import { Telemetry } from '../telemetry/storage'
 import { CompilerResult, runCompiler } from './compiler'
 import { createEntrypoints, createPagesMapping } from './entries'
 import { generateBuildId } from './generate-build-id'
 import { isWriteable } from './is-writeable'
-import createSpinner from './spinner'
+// import createSpinner from './spinner'
 import {
   collectPages,
   getJsPageSizeInKb,
@@ -118,43 +118,43 @@ export default async function build(
 
   const { headers, rewrites, redirects } = await loadCustomRoutes(config)
 
-  if (ciEnvironment.isCI && !ciEnvironment.hasNextSupport) {
-    const cacheDir = path.join(distDir, 'cache')
-    const hasCache = await fileExists(cacheDir)
+  // if (ciEnvironment.isCI && !ciEnvironment.hasNextSupport) {
+  //   const cacheDir = path.join(distDir, 'cache')
+  //   const hasCache = await fileExists(cacheDir)
 
-    if (!hasCache) {
-      // Intentionally not piping to stderr in case people fail in CI when
-      // stderr is detected.
-      console.log(
-        chalk.bold.yellow(`Warning: `) +
-          chalk.bold(
-            `No build cache found. Please configure build caching for faster rebuilds. Read more: https://err.sh/next.js/no-cache`
-          )
-      )
-      console.log('')
-    }
-  }
+  //   if (!hasCache) {
+  //     // Intentionally not piping to stderr in case people fail in CI when
+  //     // stderr is detected.
+  //     console.log(
+  //       chalk.bold.yellow(`Warning: `) +
+  //         chalk.bold(
+  //           `No build cache found. Please configure build caching for faster rebuilds. Read more: https://err.sh/next.js/no-cache`
+  //         )
+  //     )
+  //     console.log('')
+  //   }
+  // }
 
-  const buildSpinner = createSpinner({
-    prefixText: 'Creating an optimized production build',
-  })
+  // const buildSpinner = createSpinner({
+  //   prefixText: 'Creating an optimized production build',
+  // })
 
-  const telemetry = new Telemetry({ distDir })
+  // const telemetry = new Telemetry({ distDir })
 
   const publicDir = path.join(dir, 'public')
   const pagesDir = findPagesDir(dir)
   const hasPublicDir = await fileExists(publicDir)
 
-  telemetry.record(
-    eventCliSession(PHASE_PRODUCTION_BUILD, dir, {
-      cliCommand: 'build',
-      isSrcDir: path.relative(dir, pagesDir!).startsWith('src'),
-      hasNowJson: !!(await findUp('now.json', { cwd: dir })),
-      isCustomServer: null,
-    })
-  )
+  // telemetry.record(
+  //   eventCliSession(PHASE_PRODUCTION_BUILD, dir, {
+  //     cliCommand: 'build',
+  //     isSrcDir: path.relative(dir, pagesDir!).startsWith('src'),
+  //     hasNowJson: !!(await findUp('now.json', { cwd: dir })),
+  //     isCustomServer: null,
+  //   })
+  // )
 
-  eventNextPlugins(path.resolve(dir)).then((events) => telemetry.record(events))
+  // eventNextPlugins(path.resolve(dir)).then((events) => telemetry.record(events))
 
   const ignoreTypeScriptErrors = Boolean(config.typescript?.ignoreBuildErrors)
   await verifyTypeScriptSetup(dir, pagesDir, !ignoreTypeScriptErrors)
@@ -386,9 +386,9 @@ export default async function build(
   }
 
   const webpackBuildEnd = process.hrtime(webpackBuildStart)
-  if (buildSpinner) {
-    buildSpinner.stopAndPersist()
-  }
+  // if (buildSpinner) {
+  //   buildSpinner.stopAndPersist()
+  // }
   console.log()
 
   result = formatWebpackMessages(result)
@@ -428,11 +428,11 @@ export default async function build(
     }
     throw new Error('> Build failed because of webpack errors')
   } else {
-    telemetry.record(
-      eventBuildCompleted(pagePaths, {
-        durationInSeconds: webpackBuildEnd[0],
-      })
-    )
+    // telemetry.record(
+    //   eventBuildCompleted(pagePaths, {
+    //     durationInSeconds: webpackBuildEnd[0],
+    //   })
+    // )
 
     if (result.warnings.length > 0) {
       console.warn(chalk.yellow('Compiled with warnings.\n'))
@@ -442,9 +442,9 @@ export default async function build(
       console.log(chalk.green('Compiled successfully.\n'))
     }
   }
-  const postBuildSpinner = createSpinner({
-    prefixText: 'Automatically optimizing pages',
-  })
+  // const postBuildSpinner = createSpinner({
+  //   prefixText: 'Automatically optimizing pages',
+  // })
 
   const manifestPath = path.join(
     distDir,
@@ -878,23 +878,23 @@ export default async function build(
     )
   }
 
-  if (postBuildSpinner) postBuildSpinner.stopAndPersist()
+  // if (postBuildSpinner) postBuildSpinner.stopAndPersist()
   console.log()
 
   const analysisEnd = process.hrtime(analysisBegin)
-  telemetry.record(
-    eventBuildOptimize(pagePaths, {
-      durationInSeconds: analysisEnd[0],
-      staticPageCount: staticPages.size,
-      staticPropsPageCount: ssgPages.size,
-      serverPropsPageCount: serverPropsPages.size,
-      ssrPageCount:
-        pagePaths.length -
-        (staticPages.size + ssgPages.size + serverPropsPages.size),
-      hasStatic404: useStatic404,
-      hasReportWebVitals: namedExports?.includes('reportWebVitals') ?? false,
-    })
-  )
+  // telemetry.record(
+  //   eventBuildOptimize(pagePaths, {
+  //     durationInSeconds: analysisEnd[0],
+  //     staticPageCount: staticPages.size,
+  //     staticPropsPageCount: ssgPages.size,
+  //     serverPropsPageCount: serverPropsPages.size,
+  //     ssrPageCount:
+  //       pagePaths.length -
+  //       (staticPages.size + ssgPages.size + serverPropsPages.size),
+  //     hasStatic404: useStatic404,
+  //     hasReportWebVitals: namedExports?.includes('reportWebVitals') ?? false,
+  //   })
+  // )
 
   if (ssgPages.size > 0) {
     const finalDynamicRoutes: PrerenderManifest['dynamicRoutes'] = {}
@@ -1046,7 +1046,7 @@ export default async function build(
     })
   }
 
-  await telemetry.flush()
+  // await telemetry.flush()
 }
 
 function generateClientSsgManifest(
